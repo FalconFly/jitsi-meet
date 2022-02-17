@@ -16,11 +16,12 @@ import {
 import {
     CLEAR_RECORDING_SESSIONS,
     RECORDING_SESSION_UPDATED,
+    SET_MEETING_BOOKMARK_BUTTON_STATE,
     SET_PENDING_RECORDING_NOTIFICATION_UID,
     SET_SELECTED_RECORDING_SERVICE,
     SET_STREAM_KEY
 } from './actionTypes';
-import { getRecordingLink, getResourceId, isSavingRecordingOnDropbox } from './functions';
+import { getRecordingLink, getResourceId, isSavingRecordingOnDropbox, sendMeetingHighlight } from './functions';
 import logger from './logger';
 
 declare var APP: Object;
@@ -35,6 +36,21 @@ declare var APP: Object;
 export function clearRecordingSessions() {
     return {
         type: CLEAR_RECORDING_SESSIONS
+    };
+}
+
+/**
+ * Sets the meeting bookmark button disable state.
+ *
+ * @param {boolean} disabled - The disabled state value.
+ * @returns {{
+ *     type: CLEAR_RECORDING_SESSIONS
+ * }}
+ */
+export function setMeetingBookmarkButtonState(disabled: boolean) {
+    return {
+        type: SET_MEETING_BOOKMARK_BUTTON_STATE,
+        disabled
     };
 }
 
@@ -102,6 +118,27 @@ export function showPendingRecordingNotification(streamType: string) {
         if (notification) {
             dispatch(_setPendingRecordingNotificationUid(notification.uid, streamType));
         }
+    };
+}
+
+/**
+ * Bookmarks a meeting highlight.
+ *
+ * {@code stream}).
+ *
+ * @returns {Function}
+ */
+export function bookmarkMeetingHighlight() {
+    return async (dispatch: Function, getState: Function) => {
+        dispatch(setMeetingBookmarkButtonState(true));
+
+        try {
+            await sendMeetingHighlight(getState());
+        } catch (err) {
+            logger.error('Could not bookmark meeting highlight', err);
+        }
+
+        dispatch(setMeetingBookmarkButtonState(false));
     };
 }
 

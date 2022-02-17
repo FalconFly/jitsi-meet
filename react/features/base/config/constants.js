@@ -14,6 +14,7 @@ export const _CONFIG_STORE_PREFIX = 'config.js';
  * @type Array<string>
  */
 export const TOOLBAR_BUTTONS = [
+    'bookmark',
     'camera',
     'chat',
     'closedcaptions',
